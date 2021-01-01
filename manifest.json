@@ -4,9 +4,11 @@
     "description": "Track and log your favorite restaurants on DoorDash and eventually others",
     "version": "1.0.0",
     "icons": {"128": "icon-128.png"},
-    "browser_action": {
-        "default_icon": "icon.png",
-        "deafult_popup": "popup.html"
-    },
+    "content_scripts": [
+        {
+          "matches": ["https://doordash.com/*"],
+          "js": ["experiments/favorite-button/content-script.js"]
+        }
+      ],
     "permissions": ["activeTab"]
 }
