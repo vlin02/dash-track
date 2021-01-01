@@ -1,12 +1,16 @@
+document.head.insertAdjacentHTML('beforeEnd',
+    `<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>`
+)
+
 observer = new MutationObserver(() => {
-  const titleDiv = [].concat(
-      Array.from(document.getElementsByClassName("sc-dTLGrV gYYmdm sc-kVyEtE efQmPr")),
-      Array.from(document.getElementsByClassName("sc-dTLGrV gYYmdm sc-dyKSPo gutEGH")),
-  )[0]
+  const titleDiv = $(".sc-dTLGrV.gYYmdm")
   
-  if (titleDiv !== undefined && titleDiv.innerText !== "Hijacked") {
-    titleDiv.innerText="Hijacked"
-    console.log('found')
+  if (titleDiv !== undefined) {
+      console.log("we here")
+    var titleParent = titleDiv.parent()
+    titleDiv.remove()
+    observer.disconnect()
   }
 });
 

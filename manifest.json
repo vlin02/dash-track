@@ -10,6 +10,9 @@
           "js": ["experiments/favorite-button/content-script.js"]
         }
       ],
-
+      "background":
+      {
+          "scripts": ["thirdParty/jquery-2.0.3.js"]
+      },
     "permissions": ["activeTab"]
 }
