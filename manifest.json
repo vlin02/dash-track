@@ -6,7 +6,7 @@
     "icons": {"128": "icon-128.png"},
     "content_scripts": [
         {
-          "matches": ["https://www.doordash.com/*"],
+          "matches": ["https://www.doordash.com/store/*"],
           "js": ["experiments/favorite-button/content-script.js"]
         }
       ],
