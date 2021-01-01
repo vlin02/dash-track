@@ -6,9 +6,10 @@
     "icons": {"128": "icon-128.png"},
     "content_scripts": [
         {
-          "matches": ["https://doordash.com/*"],
+          "matches": ["https://www.doordash.com/*"],
           "js": ["experiments/favorite-button/content-script.js"]
         }
       ],
+
     "permissions": ["activeTab"]
 }
