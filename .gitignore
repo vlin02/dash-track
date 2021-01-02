@@ -2,3 +2,4 @@ icon-attributions.html
 node_modules/
 build/
 *.DS_store
+jsconfig.json
