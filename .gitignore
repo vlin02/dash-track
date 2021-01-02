@@ -1,2 +1,5 @@
 icon-attributions.html
-.DS_Store
+node_modules
+build/
+.gitignore
+.DS_store
