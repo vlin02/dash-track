@@ -8,65 +8,20 @@ const injectFavoriteButton = new MutationObserver(() => {
     schema.length > 0
   ) {
     const context = JSON.parse(schema.html())
+    console.log('here')
 
-    let favoritesList = []
-    let isFavorited = () => favoritesList.some((rsnt) => rsnt['@id'] === context['@id'])
-
-    chrome.storage.sync.get("favorites", (res) => {
-      if (res.favorites !== undefined) favoritesList = res.favorites
-
-      addFavorite = () => {
-        if (!isFavorited()) {
-          favoritesList.push(context)
-        } else {
-          alert("This restaurant is already favorited")
-        }
-
-        chrome.storage.sync.set({ favorites: favoritesList })
-        addFavoriteButton.hide()
-        removeFavoriteButton.show()
-      }
-
-      removeFavorite = () => {
-        if (isFavorited()) {
-          favoritesList = favoritesList.filter(
-            (rsnt) => rsnt['@id'] !== context['@id']
-          )
-        } else {
-          alert("This restaurant is already unfavorited")
-        }
-
-        chrome.storage.sync.set({ favorites: favoritesList })
-        removeFavoriteButton.hide()
-        addFavoriteButton.show()
-      }
-
-      const addFavoriteButton = $("<button/>", {
-        class: "btn btn-outline-danger",
-        html: 'Favorite <i class="far fa-heart"/>',
-        click: addFavorite,
-      })
-
-      const removeFavoriteButton = $("<button/>", {
-        class: "btn btn-danger",
-        html: 'Unfavorite <i class="fas fa-heart-broken"/>',
-        click: removeFavorite,
-      })
-
-      if (isFavorited()) {
-        addFavoriteButton.hide()
-      } else {
-        removeFavoriteButton.hide()
-      }
-
+    renderFavoriteButton("doordash", {
+      id: context['@id'],
+      name: context['name']
+    }).then((favButton) => {
       const nameContainer = $("<div/>", {
         class: "d-inline-flex w-100 justify-content-between",
-      }).append([storeName.clone(), removeFavoriteButton, addFavoriteButton])
+      }).append([storeName.clone(), favButton])
 
       storeName.replaceWith(nameContainer)
-
-      injectFavoriteButton.disconnect()
     })
+
+    injectFavoriteButton.disconnect()
   }
 })
 

@@ -17,6 +17,7 @@
     {
       "matches": ["https://www.doordash.com/store/*"],
       "js": [
+        "scripts/favorite-button/renderFavoriteButton.js",
         "scripts/favorite-button/content-script.js"
       ]
     }
