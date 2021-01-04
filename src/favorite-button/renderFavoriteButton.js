@@ -1,4 +1,4 @@
-const renderFavoriteButton = (vendor, context) =>
+const renderFavoriteButton = (vendor, context, classes = ["", "btn btn-outline-danger", "btn btn-danger"]) =>
   new Promise((resolve) => {
     const isFavorited = (favorites) =>
       favorites.some((rsnt) => rsnt["id"] === context["id"])
@@ -37,13 +37,13 @@ const renderFavoriteButton = (vendor, context) =>
       })
 
     const addFavoriteButton = $("<button/>", {
-      class: "btn btn-outline-danger",
+      class: classes[1],
       html: 'Favorite <i class="far fa-heart"/>',
       click: addFavorite,
     })
 
     const removeFavoriteButton = $("<button/>", {
-      class: "btn btn-danger",
+      class: classes[2],
       html: 'Unfavorite <i class="fas fa-heart-broken"/>',
       click: removeFavorite,
     })
@@ -55,6 +55,11 @@ const renderFavoriteButton = (vendor, context) =>
         removeFavoriteButton.hide()
       }
 
-      resolve($('<div/>').append([addFavoriteButton, removeFavoriteButton]))
+      resolve(
+        $("<div/>", {
+          class: classes[0],
+          id: "favorite-button",
+        }).append([addFavoriteButton, removeFavoriteButton])
+      )
     })
   })
