@@ -1,4 +1,4 @@
-const renderFavoriteButton = (vendor, context, classes = ["", "btn btn-outline-danger", "btn btn-danger"]) =>
+const renderFavoriteButton = (vendor, context, attr) =>
   new Promise((resolve) => {
     const isFavorited = (favorites) =>
       favorites.some((rsnt) => rsnt["id"] === context["id"])
@@ -10,6 +10,26 @@ const renderFavoriteButton = (vendor, context, classes = ["", "btn btn-outline-d
         callback(res[vendor].favorites)
       })
 
+    const favButton = $("<button/>", {
+      id: "favorite-button"
+    })
+
+    let addFavorite, removeFavorite
+
+    const setAddButton = () => {
+      favButton.html('Favorite <i class="far fa-heart"/>')
+      favButton.off("click")
+      favButton.click(addFavorite)
+      favButton.attr(attr.add)
+    }
+
+    const setRemoveButton = () => {
+      favButton.html('Unfavorite <i class="fas fa-heart-broken"/>')
+      favButton.off("click")
+      favButton.click(removeFavorite)
+      favButton.attr(attr.remove)
+    }
+
     addFavorite = () =>
       useFavorites((favorites) => {
         if (!isFavorited(favorites)) {
@@ -19,8 +39,8 @@ const renderFavoriteButton = (vendor, context, classes = ["", "btn btn-outline-d
         }
 
         chrome.storage.sync.set({ [vendor]: { favorites } })
-        addFavoriteButton.hide()
-        removeFavoriteButton.show()
+        setRemoveButton()
+        favButton.blur()
       })
 
     removeFavorite = () =>
@@ -32,34 +52,12 @@ const renderFavoriteButton = (vendor, context, classes = ["", "btn btn-outline-d
         }
 
         chrome.storage.sync.set({ [vendor]: { favorites } })
-        removeFavoriteButton.hide()
-        addFavoriteButton.show()
+        setAddButton()
+        favButton.blur()
       })
 
-    const addFavoriteButton = $("<button/>", {
-      class: classes[1],
-      html: 'Favorite <i class="far fa-heart"/>',
-      click: addFavorite,
-    })
-
-    const removeFavoriteButton = $("<button/>", {
-      class: classes[2],
-      html: 'Unfavorite <i class="fas fa-heart-broken"/>',
-      click: removeFavorite,
-    })
-
     useFavorites((favorites) => {
-      if (isFavorited(favorites)) {
-        addFavoriteButton.hide()
-      } else {
-        removeFavoriteButton.hide()
-      }
-
-      resolve(
-        $("<div/>", {
-          class: classes[0],
-          id: "favorite-button",
-        }).append([addFavoriteButton, removeFavoriteButton])
-      )
+      isFavorited(favorites) ? setRemoveButton() : setAddButton()
+      resolve(favButton)
     })
   })
