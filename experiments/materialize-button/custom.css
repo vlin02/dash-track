@@ -21,15 +21,15 @@
 .fav-btn {
   background-position: center;
   transition: background 0.8s;
-  background-color: #ec407a !important;
+  background-color: #d81b60 !important;
 }
 
 .fav-btn:hover {
-  background: #f06292 radial-gradient(circle, transparent 1%, #f06292 1%) center/15000% !important;
+  background: #e91e63 radial-gradient(circle, transparent 1%, #e91e63 1%) center/15000% !important;
 }
 
 .fav-btn:active {
-  background-color: #f8bbd0 !important;
+  background-color: #f06292 !important;
   background-size: 100% !important;
   transition: background 0s;
 }

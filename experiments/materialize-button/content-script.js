@@ -4,38 +4,26 @@ $("head").append(
   )
 )
 
-const floatButton = $.parseHTML(`
-<div class="fixed-action-btn direction-top" style="bottom: 45px; right: 24px;">
-  <a class="not-fav-btn btn-floating btn-large">
-    <i class="material-icons">favorite</i>
-  </a>
-  <ul>
-    <li>
-      <a class="fav-item btn-floating grey darken-3 tooltipped" data-position="left" data-tooltip="View favorited items">
-      <i class="material-icons yellow-text darken-1">star</i>
-      </a>
-    </li>
-  </ul>
-</div>
-`)
+let canInject = true
 
 const injectFavoriteButton = new MutationObserver(() => {
   const schema = $('script[type="application/ld+json"]:contains(@context)')
-  const favoriteButton = $("#favorite-button")
 
-  if (schema.length && !favoriteButton.length) {
+  if (schema.length !== 0 && canInject) {
     const context = JSON.parse(schema.html())
     const url = context["@id"]
 
     if (url && url.match(/^https:\/\/www.doordash.com\/store\/.*/)) {
+      canInject = false
       renderFavoriteButton("doordash", {
         id: context["@id"],
         name: context["name"]
       }).then((favButton) => {
-        $("body > #root").append(favButton)
-        $(".fixed-action-btn").floatingActionButton()
-        $(".tooltipped").tooltip()
+        $("body > #root > div").append(favButton)
       })
+    } else if (!canInject) {
+      $(".favorite-wrapper").remove()
+      canInject = true
     }
   }
 })

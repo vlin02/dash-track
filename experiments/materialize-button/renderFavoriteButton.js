@@ -10,24 +10,51 @@ const renderFavoriteButton = (vendor, context) =>
         callback(res[vendor].favorites)
       })
 
+    const buttonWrapper = $("<div/>", {
+      class: "fixed-action-btn direction-top favorite-wrapper",
+      style: "bottom: 45px; right: 24px;",
+      id: "button-wrapper"
+    })
+
     const favButton = $("<a/>", {
-      id: "favorite-button",
       class: "btn-floating btn-large",
       html: '<i class="material-icons">favorite</i>'
     })
 
+    const showStarred = $("<a/>", {
+      class: "fav-item btn-floating grey darken-3",
+      html: `<i class="material-icons yellow-text darken-1">star</i>`,
+      "data-position": "left",
+      "data-tooltip": "View favorited items"
+    })
+
+    const toolBar = $("<ul/>").append([
+      $("<li/>", {
+        html: showStarred
+      })
+    ])
+
     let setAddButton, setRemoveButton
 
     setAddButton = () => {
+      buttonWrapper.floatingActionButton({ hoverEnabled: false })
+
+      toolBar.hide()
+
       favButton.off("click")
-      favButton.click(setRemoveButton)
-      favButton.removeClass("fav-btn").addClass("not-fav-btn")
+      favButton.click(addFavorite)
+      favButton.removeClass("fav-btn").addClass("not-fav-btn tooltipped")
     }
 
-    setRemoveButton = () => {
+    setRemoveButton = (notLoad = true) => {
+      buttonWrapper.floatingActionButton({ hoverEnabled: true })
+      if (notLoad) buttonWrapper.floatingActionButton("open")
+
+      toolBar.show()
+
       favButton.off("click")
-      favButton.click(setAddButton)
-      favButton.removeClass("not-fav-btn").addClass("fav-btn")
+      favButton.click(removeFavorite)
+      favButton.removeClass("not-fav-btn tooltipped").addClass("fav-btn")
     }
 
     addFavorite = () =>
@@ -55,12 +82,11 @@ const renderFavoriteButton = (vendor, context) =>
       })
 
     useFavorites((favorites) => {
-      isFavorited(favorites) ? setRemoveButton() : setAddButton()
-      resolve(
-        $("<div/>", {
-          class: "fixed-action-btn direction-top",
-          style: "bottom: 45px; right: 24px;"
-        }).append([favButton])
-      )
+      buttonWrapper.append([favButton, toolBar])
+
+      isFavorited(favorites) ? setRemoveButton(false) : setAddButton()
+      showStarred.tooltip()
+
+      resolve(buttonWrapper)
     })
   })
