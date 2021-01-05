@@ -1,9 +1,3 @@
-$("head").append(
-  $.parseHTML(
-    '<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">'
-  )
-)
-
 const injectFavoriteButton = (vendor, title_pattern, inject_query) => {
   new MutationObserver(() => {
     const schema = $('script[type="application/ld+json"]:contains(@context)')
