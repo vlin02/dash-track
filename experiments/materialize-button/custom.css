@@ -1,0 +1,45 @@
+.fav-item {
+    opacity: 0;
+    transform: scale(0.4) translateY(40px) translateX(0px);
+}
+
+.fav-item {
+  background-position: center;
+  transition: background 0.8s;
+}
+
+.not-fav-btn:hover, .fav-item:hover {
+  background: #616161 radial-gradient(circle, transparent 1%, #616161 1%) center/15000% !important;
+}
+
+.not-fav-btn:active, .fav-item:active {
+  background-color: #9e9e9e !important;
+  background-size: 100% !important;
+  transition: background 0s;
+}
+
+.fav-btn {
+  background-position: center;
+  transition: background 0.8s;
+  background-color: #ec407a !important;
+}
+
+.fav-btn:hover {
+  background: #f06292 radial-gradient(circle, transparent 1%, #f06292 1%) center/15000% !important;
+}
+
+.fav-btn:active {
+  background-color: #f8bbd0 !important;
+  background-size: 100% !important;
+  transition: background 0s;
+}
+
+.not-fav-btn {
+  background-position: center;
+  transition: background 0.8s;
+  background-color: #424242 !important;
+}
+
+.not-fav-btn > .material-icons {
+  color: #757575 !important;
+}

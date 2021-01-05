@@ -21,7 +21,7 @@ const injectFavoriteButton = new MutationObserver(() => {
   ) {
     const context = JSON.parse(schema.html())
     const url = context["@id"]
-    console.log(url)
+    
     if (url && url.match(/^https:\/\/www.doordash.com\/store\/.*/)) {
       renderFavoriteButton("doordash", {
         id: context["@id"],
