@@ -1,4 +1,4 @@
-const renderFavoriteButton = (vendor, context, attr) =>
+const renderFavoriteButton = (vendor, context) =>
   new Promise((resolve) => {
     const isFavorited = (favorites) =>
       favorites.some((rsnt) => rsnt["id"] === context["id"])
@@ -10,24 +10,51 @@ const renderFavoriteButton = (vendor, context, attr) =>
         callback(res[vendor].favorites)
       })
 
-    const favButton = $("<button/>", {
-      id: "favorite-button"
+    const buttonWrapper = $("<div/>", {
+      class: "fixed-action-btn direction-top favorite-wrapper",
+      style: "bottom: 45px; right: 24px; z-index: 10000;",
+      id: "button-wrapper"
     })
 
-    let addFavorite, removeFavorite
+    const favButton = $("<a/>", {
+      class: "btn-floating btn-large",
+      html: '<i class="material-icons">favorite</i>'
+    })
 
-    const setAddButton = () => {
-      favButton.html('Favorite <i class="far fa-heart"/>')
-      favButton.off("click")
-      favButton.click(addFavorite)
-      favButton.attr(attr.add)
-    }
+    const showStarred = $("<a/>", {
+      class: "fav-item btn-floating grey darken-3",
+      html: `<i class="material-icons yellow-text darken-1">star</i>`,
+      "data-position": "left",
+      "data-tooltip": "View favorited items"
+    })
 
-    const setRemoveButton = () => {
-      favButton.html('Unfavorite <i class="fas fa-heart-broken"/>')
+    const toolBar = $("<ul/>").append([
+      $("<li/>", {
+        html: showStarred
+      })
+    ])
+
+    let setFavButton, setNotFavButton
+
+    setFavButton = (onLoad = false) => {
+      buttonWrapper.floatingActionButton({ hoverEnabled: true })
+      if (!onLoad) buttonWrapper.floatingActionButton("open")
+
+      toolBar.show()
+
       favButton.off("click")
       favButton.click(removeFavorite)
-      favButton.attr(attr.remove)
+      favButton.removeClass("not-fav-btn tooltipped").addClass("fav-btn")
+    }
+
+    setNotFavButton = () => {
+      buttonWrapper.floatingActionButton({ hoverEnabled: false })
+
+      toolBar.hide()
+
+      favButton.off("click")
+      favButton.click(addFavorite)
+      favButton.removeClass("fav-btn").addClass("not-fav-btn tooltipped")
     }
 
     addFavorite = () =>
@@ -39,8 +66,7 @@ const renderFavoriteButton = (vendor, context, attr) =>
         }
 
         chrome.storage.sync.set({ [vendor]: { favorites } })
-        setRemoveButton()
-        favButton.blur()
+        setFavButton()
       })
 
     removeFavorite = () =>
@@ -52,12 +78,15 @@ const renderFavoriteButton = (vendor, context, attr) =>
         }
 
         chrome.storage.sync.set({ [vendor]: { favorites } })
-        setAddButton()
-        favButton.blur()
+        setNotFavButton()
       })
 
     useFavorites((favorites) => {
-      isFavorited(favorites) ? setRemoveButton() : setAddButton()
-      resolve(favButton)
+      buttonWrapper.append([favButton, toolBar])
+
+      isFavorited(favorites) ? setFavButton(true) : setNotFavButton()
+      showStarred.tooltip()
+
+      resolve(buttonWrapper)
     })
   })

@@ -14,26 +14,26 @@
       ],
       "css": [
         "src/thirdParty/materialize.min.css",
-        "experiments/materialize-button/custom.css"
+        "src/favorite-button/custom.css"
       ],
       "js": [
         "src/thirdParty/jquery-3.5.1.min.js",
         "src/thirdParty/materialize.min.js",
-        "experiments/materialize-button/renderFavoriteButton.js",
-        "experiments/materialize-button/injectFavoriteButton.js"
+        "src/favorite-button/renderFavoriteButton.js",
+        "src/favorite-button/injectFavoriteButton.js"
       ]
     },
     {
       "matches": ["https://www.doordash.com/*"],
-      "js": ["experiments/materialize-button/doordash.js"]
+      "js": ["src/favorite-button/doordash.js"]
     },
     {
       "matches": ["https://www.ubereats.com/*"],
-      "js": ["experiments/materialize-button/ubereats.js"]
+      "js": ["src/favorite-button/ubereats.js"]
     },
     {
       "matches": ["https://www.grubhub.com/*"],
-      "js": ["experiments/materialize-button/grubhub.js"]
+      "js": ["src/favorite-button/grubhub.js"]
     }
   ],
   "permissions": ["storage", "tabs"]
