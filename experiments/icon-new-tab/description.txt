@@ -1,0 +1,2 @@
+Success:
+Icon click opens new tab with custom html
