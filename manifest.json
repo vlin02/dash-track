@@ -5,6 +5,13 @@
   "version": "1.0.0",
   "icons": { "128": "images/icon-128.png" },
   "web_accessible_resources": ["images/*"],
+  "browser_action": {
+    "default_icon": "images/icon.png"
+  },
+  "background": {
+    "scripts": ["experiments/icon-new-tab/background.js"],
+    "persistent": false
+  },
   "content_scripts": [
     {
       "matches": [
@@ -36,5 +43,5 @@
       "js": ["experiments/materialize-button/grubhub.js"]
     }
   ],
-  "permissions": ["storage", "tabs"]
+  "permissions": ["storage"]
 }
