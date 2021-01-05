@@ -12,7 +12,7 @@ const renderFavoriteButton = (vendor, context) =>
 
     const buttonWrapper = $("<div/>", {
       class: "fixed-action-btn direction-top favorite-wrapper",
-      style: "bottom: 45px; right: 24px;",
+      style: "bottom: 45px; right: 24px; z-index: 10000;",
       id: "button-wrapper"
     })
 
@@ -34,9 +34,20 @@ const renderFavoriteButton = (vendor, context) =>
       })
     ])
 
-    let setAddButton, setRemoveButton
+    let setFavButton, setNotFavButton
 
-    setAddButton = () => {
+    setFavButton = (onLoad = false) => {
+      buttonWrapper.floatingActionButton({ hoverEnabled: true })
+      if (!onLoad) buttonWrapper.floatingActionButton("open")
+
+      toolBar.show()
+
+      favButton.off("click")
+      favButton.click(removeFavorite)
+      favButton.removeClass("not-fav-btn tooltipped").addClass("fav-btn")
+    }
+
+    setNotFavButton = () => {
       buttonWrapper.floatingActionButton({ hoverEnabled: false })
 
       toolBar.hide()
@@ -44,17 +55,6 @@ const renderFavoriteButton = (vendor, context) =>
       favButton.off("click")
       favButton.click(addFavorite)
       favButton.removeClass("fav-btn").addClass("not-fav-btn tooltipped")
-    }
-
-    setRemoveButton = (notLoad = true) => {
-      buttonWrapper.floatingActionButton({ hoverEnabled: true })
-      if (notLoad) buttonWrapper.floatingActionButton("open")
-
-      toolBar.show()
-
-      favButton.off("click")
-      favButton.click(removeFavorite)
-      favButton.removeClass("not-fav-btn tooltipped").addClass("fav-btn")
     }
 
     addFavorite = () =>
@@ -66,7 +66,7 @@ const renderFavoriteButton = (vendor, context) =>
         }
 
         chrome.storage.sync.set({ [vendor]: { favorites } })
-        setRemoveButton()
+        setFavButton()
       })
 
     removeFavorite = () =>
@@ -78,13 +78,13 @@ const renderFavoriteButton = (vendor, context) =>
         }
 
         chrome.storage.sync.set({ [vendor]: { favorites } })
-        setAddButton()
+        setNotFavButton()
       })
 
     useFavorites((favorites) => {
       buttonWrapper.append([favButton, toolBar])
 
-      isFavorited(favorites) ? setRemoveButton(false) : setAddButton()
+      isFavorited(favorites) ? setFavButton(true) : setNotFavButton()
       showStarred.tooltip()
 
       resolve(buttonWrapper)
