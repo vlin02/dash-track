@@ -1,9 +1,28 @@
-const storeCard = () => {
+const formatTime = (date) => {
+  const s_month = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ][date.getMonth()]
+
+  return `${s_month} ${date.getDate()}, ${date.getFullYear()}`
+}
+
+const storeCard = (rsnt) => {
   const card = `
     <div class="card">
     <div class="card-image waves-effect waves-block waves-light">
-      <a href="https://www.ubereats.com/san-francisco/food-delivery/sumo-sushi-boat/1MKbP3u1Q5WsnDhs6WRwvA">
-        <img class="center-cropped" src="https://d1ralsognjng37.cloudfront.net/a6b4b1b6-efa0-4ae0-9803-d9e42959bb29.jpeg">
+      <a href="${rsnt.url}">
+        <img class="center-cropped" src="${rsnt.src}">
       </a>
       <a class="fav-btn">
         <i class="material-icons" style="font-size: 27px;">favorite</i>
@@ -11,12 +30,12 @@ const storeCard = () => {
     </div>
     <div class="card-content">
       <span class="card-title grey-text text-darken-4">
-        <strong>Sumo Sushi Boat</strong>
+        <strong>${rsnt.name}</strong>
         <span class="right valign-wrapper grey-text text-darken-2" style="font-size:15px">
-            5<i class="material-icons yellow-text text-darken-2">bookmark</i>
+            ${rsnt.items.length}<i class="material-icons yellow-text text-darken-2">bookmark</i>
         </span>
       </span>
-      <p>Added Dec 7, 2020</p>
+      <p>Added ${formatTime(new Date(rsnt.date_added))}</p>
     </div>
   `
   return card
