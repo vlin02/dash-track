@@ -53,11 +53,10 @@ const renderPageFavorite = (rsnt) =>
       favButton.removeClass("fav-btn").addClass("not-fav-btn tooltipped")
     }
 
-    rsnt.vendor.fetchRestaurants().then((rsnts) => {
-      const isFav = rsnts.some(({ url }) => url === rsnt.url)
+    rsnt.vendor.defaultFetch().then(({rsnts}) => {
       buttonWrapper.append([favButton, toolBar])
 
-      isFav ? setFavButton(true) : setNotFavButton()
+      rsnt.url in rsnts ? setFavButton(true) : setNotFavButton()
       showStarred.tooltip()
 
       resolve(buttonWrapper)

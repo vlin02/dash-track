@@ -6,29 +6,31 @@ class Restaurant {
     this.src = src
   }
 
-  updateItem = (item, action = "add") =>
-    this.vendor.fetchRestaurants().then((rsnts) => {
-      const i = rsnts.findIndex(({ url }) => url === this.url)
-      if (i === -1)
+  updateItem = (item_name, action = "add") =>
+    this.vendor.defaultFecth().then((vendor) => {
+      const { rsnts } = vendor
+      const rsnt = rsnts[this.url]
+
+      if (rsnt === undefined)
         return Promise.reject("Trying to access restaurant not added to vendor")
 
-      const { items } = rsnts[i]
-      const isSaved = items.some(({ name }) => name === item.name)
+      const { items } = rsnt
+      const isSaved = items.includes(item_name)
 
       switch (action) {
         case "add":
-          if (!isSaved) return Promise.reject("This item is already unsaved")
+          if (isSaved) return Promise.reject("This item is already saved")
           items = items.push(item)
           break
         case "remove":
           if (!isSaved) return Promise.reject("This item is already unsaved")
-          items = items.filter(({ name }) => name !== item.name)
+          items = items.filter((name) => name !== item_name)
           break
         default:
       }
+      rsnt.items = items
 
-      rsnts[i].items = items
-      chrome.storage.sync.set({ [this.vendor.name]: rsnts })
+      chrome.storage.sync.set({ [this.vendor.name]: { ...vendor, rsnts } })
     })
 }
 
@@ -37,29 +39,34 @@ class Vendor {
     this.name = name
   }
 
-  fetchRestaurants = () =>
-    new Promise((resolve) =>
-      chrome.storage.sync.get(this.name, (res) => {
-        resolve(res[this.name] !== undefined ? res[this.name] : [])
-      })
-    )
+  defaultFetch = () =>
+    new Promise((resolve) => {
+      const defaultObj = {
+        name: this.name,
+        rsnts: {}
+      }
+      chrome.storage.sync.get({ [this.name]: defaultObj }, (res) =>
+        resolve(res[this.name])
+      )
+    })
 
   addRestaurant = (rsnt) =>
-    this.fetchRestaurants().then((rsnts) => {
-      const isFav = rsnts.some(({ url }) => url === rsnt.url)
-      if (isFav) return Promise.reject("This restaurant is already favorited")
+    this.defaultFetch().then((vendor) => {
+      const { rsnts } = vendor
+      if (rsnt.url in rsnts)
+        return Promise.reject("This restaurant is already favorited")
 
-      rsnts.push({ ...rsnt, items: [], date_added: new Date().toJSON() })
-      chrome.storage.sync.set({ [this.name]: rsnts })
+      rsnts[rsnt.url] = { ...rsnt, items: [], date_added: new Date().toJSON() }
+      chrome.storage.sync.set({ [this.name]: { ...vendor, rsnts } })
     })
 
   removeRestaurant = (rsnt) =>
-    this.fetchRestaurants().then((rsnts) => {
-      const isFav = rsnts.some(({ url }) => url === rsnt.url)
-      if (!isFav)
+    this.defaultFetch().then((vendor) => {
+      const { rsnts } = vendor
+      if (!(rsnt.url in rsnts))
         return Promise.reject("This restaurant is already unfavorited")
 
-      rsnts = rsnts.filter(({ url }) => url !== rsnt.url)
-      chrome.storage.sync.set({ [this.name]: rsnts })
+      delete rsnts[rsnt.url]
+      chrome.storage.sync.set({ [this.name]: { ...vendor, rsnts } })
     })
 }
