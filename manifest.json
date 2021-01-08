@@ -26,7 +26,7 @@
       "js": [
         "src/thirdParty/jquery-3.5.1.min.js",
         "src/thirdParty/materialize.min.js",
-        "src/storageCursor.js",
+        "src/storageCursors.js",
         "src/components/PageFavoriteButton.js"
       ]
     },
