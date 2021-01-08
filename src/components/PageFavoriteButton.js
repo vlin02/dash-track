@@ -1,15 +1,5 @@
-const renderFavoriteButton = (vendor, context) =>
+const renderPageFavorite = (rsnt) =>
   new Promise((resolve) => {
-    const isFavorited = (favorites) =>
-      favorites.some((rsnt) => rsnt["id"] === context["id"])
-
-    const useFavorites = (callback) =>
-      chrome.storage.sync.get(vendor, (res) => {
-        if (res[vendor] === undefined) res[vendor] = {}
-        if (res[vendor].favorites === undefined) res[vendor].favorites = []
-        callback(res[vendor].favorites)
-      })
-
     const buttonWrapper = $("<div/>", {
       class: "fixed-action-btn direction-top favorite-wrapper",
       style: "bottom: 45px; right: 24px; z-index: 10000;",
@@ -43,7 +33,10 @@ const renderFavoriteButton = (vendor, context) =>
       toolBar.show()
 
       favButton.off("click")
-      favButton.click(removeFavorite)
+      favButton.click(() => {
+        rsnt.vendor.removeRestaurant(rsnt).catch(alert)
+        setNotFavButton()
+      })
       favButton.removeClass("not-fav-btn tooltipped").addClass("fav-btn")
     }
 
@@ -53,38 +46,18 @@ const renderFavoriteButton = (vendor, context) =>
       toolBar.hide()
 
       favButton.off("click")
-      favButton.click(addFavorite)
+      favButton.click(() => {
+        rsnt.vendor.addRestaurant(rsnt).catch(alert)
+        setFavButton()
+      })
       favButton.removeClass("fav-btn").addClass("not-fav-btn tooltipped")
     }
 
-    addFavorite = () =>
-      useFavorites((favorites) => {
-        if (!isFavorited(favorites)) {
-          favorites.push(context)
-        } else {
-          alert("This restaurant is already favorited")
-        }
-
-        chrome.storage.sync.set({ [vendor]: { favorites } })
-        setFavButton()
-      })
-
-    removeFavorite = () =>
-      useFavorites((favorites) => {
-        if (isFavorited(favorites)) {
-          favorites = favorites.filter((rsnt) => rsnt["@id"] !== context["@id"])
-        } else {
-          alert("This restaurant is already unfavorited")
-        }
-
-        chrome.storage.sync.set({ [vendor]: { favorites } })
-        setNotFavButton()
-      })
-
-    useFavorites((favorites) => {
+    rsnt.vendor.fetchRestaurants().then((rsnts) => {
+      const isFav = rsnts.some(({ url }) => url === rsnt.url)
       buttonWrapper.append([favButton, toolBar])
 
-      isFavorited(favorites) ? setFavButton(true) : setNotFavButton()
+      isFav ? setFavButton(true) : setNotFavButton()
       showStarred.tooltip()
 
       resolve(buttonWrapper)
