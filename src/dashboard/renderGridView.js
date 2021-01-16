@@ -7,15 +7,14 @@ const renderGridView = (rsnts) => {
       })
     )
 
-    let grid = $("<div/>")
+    let grid = []
     let row
 
     for (let i = 0; i < storeCards.length; i++) {
       if (i % 3 === 0) row = $("<div/>", { class: "row" })
       row.append(storeCards[i])
-      if (i % 3 == 2 || i == storeCards.length - 1) grid.append(row)
+      if (i % 3 == 2 || i == storeCards.length - 1) grid.push(row)
     }
-
     return grid
   }
 

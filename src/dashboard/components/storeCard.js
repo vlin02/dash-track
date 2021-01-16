@@ -19,7 +19,7 @@ const formatTime = (date) => {
 
 const storeCard = (rsnt) => {
   const card = `
-    <div class="card">
+    <div class="card hoverable">
     <div class="card-image waves-effect waves-block waves-light">
       <a href="${rsnt.url}">
         <img class="center-cropped" src="${rsnt.src}">

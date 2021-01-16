@@ -43,3 +43,8 @@
 .card-content {
     padding: 15px !important;
 }
+
+.vendor-img {
+  width: 40px;
+  height: 40px;
+}
