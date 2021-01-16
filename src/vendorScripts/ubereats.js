@@ -10,11 +10,12 @@ new MutationObserver(() => {
 
     if ($("title").text().match(/ | Menu & Prices | Uber Eats$/)) {
       const img_src = context["image"][2].replace("\\u002F", "/")
-      renderPageFavorite(
-        new Restaurant(context["name"],  context["@id"], img_src, vendor)
-      ).then((favButton) => {
-        injectDiv.append([favButton])
-      })
+      
+      injectDiv.append(
+        new pageFavoriteButton(
+          new Restaurant(context["name"],  context["@id"], img_src, vendor)
+        ).buttonWrapper
+      )
     }
   } else if (favWrapper.length > 1) {
     favWrapper.first().remove()

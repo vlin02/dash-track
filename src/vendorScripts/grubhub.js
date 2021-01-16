@@ -9,11 +9,11 @@ new MutationObserver(() => {
     const context = JSON.parse(schema.html())
 
     if ($("title").text().match(/ | Order Online With Grubhub$/)) {
-      renderPageFavorite(
-        new Restaurant(context["name"],  context["@id"], context["image"], vendor)
-      ).then((favButton) => {
-        injectDiv.append([favButton])
-      })
+      injectDiv.append(
+        new pageFavoriteButton(
+          new Restaurant(context["name"],  context["@id"], context["image"], vendor)
+        ).buttonWrapper
+      )
     }
   } else if (favWrapper.length > 1) {
     favWrapper.first().remove()

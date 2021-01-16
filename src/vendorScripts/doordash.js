@@ -17,15 +17,16 @@ new MutationObserver(() => {
 
     if ($("title").text().match(" - Delivery Menu - ")) {
       const banner = $("img[srcset*='/media/store']")
-      const img_src = banner.length === 0 ? context["image"] : banner[0].srcset.split(" ")[10]
-      renderPageFavorite(
-        new Restaurant(context["name"],  context["@id"], img_src, vendor)
-      ).then((favButton) => {
-        injectDiv.append([favButton])
-      })
+      const img_src =
+        banner.length === 0 ? context["image"] : banner[0].srcset.split(" ")[10]
+
+      injectDiv.append(
+        new pageFavoriteButton(
+          new Restaurant(context["name"], context["@id"], img_src, vendor)
+        ).buttonWrapper
+      )
     }
   } else if (favWrapper.length > 1) {
     favWrapper.first().remove()
   }
 }).observe(document.body, { childList: true, subtree: true })
-

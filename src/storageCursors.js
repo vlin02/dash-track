@@ -6,7 +6,7 @@ class Restaurant {
     this.src = src
   }
 
-  updateItem = (item_name, action = "add") =>
+  updateItem = (item_name, action) =>
     this.vendor.defaultFecth().then((vendor) => {
       const { rsnts } = vendor
       const rsnt = rsnts[this.url]
