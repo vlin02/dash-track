@@ -2,17 +2,21 @@ class dashboard {
   vendors = {
     doordash: {
       title: "DoorDash",
-      color: "#EC4528"
+      color: "#EC4528",
+      link: "https://doordash.com/"
     },
     ubereats: {
       title: "UberEats",
-      color: "#529F08"
+      color: "#529F08",
+      link: "https://ubereats.com/"
     },
     grubhub: {
       title: "GrubHub",
-      color: "#F74A55"
+      color: "#F74A55",
+      link: "https://grubhub.com/"
     }
   }
+  settings = new Settings()
 
   vendorTitle = new vendorTitle()
 
@@ -26,7 +30,7 @@ class dashboard {
 
   gridView = new gridView()
 
-  settings = new Settings()
+  unfavoriteModal = new unfavoriteModal(this.doUnfavorite)
 
   constructor() {
     for (const v_name1 of Object.keys(this.vendors)) {
@@ -61,7 +65,13 @@ class dashboard {
 
     const content = $("<div/>", {
       style: "width: 95vw; margin: auto; margin-top: 15px"
-    }).append([logo, header, divider, this.gridView.get()])
+    }).append([
+      logo,
+      header,
+      divider,
+      this.gridView.get(),
+      this.unfavoriteModal.get()
+    ])
 
     this.settings
       .defaultFetch()
@@ -71,10 +81,7 @@ class dashboard {
   }
 
   setVendor = (v_name) => {
-    const vendor = new Vendor(v_name)
-
-    const { title, color } = this.vendors[v_name]
-    this.vendorTitle.set(title, color)
+    this.vendorTitle.set(this.vendors[v_name])
 
     for (const v_name1 of Object.keys(this.vendors)) {
       if (v_name1 == v_name) {
@@ -95,7 +102,16 @@ class dashboard {
       })
     })
 
-    this.renderGrid(vendor)
+    this.renderGrid(new Vendor(v_name))
+  }
+
+  doUnfavorite = (rsnt) => {
+    const vendor = new Vendor(rsnt.vendor)
+    
+    vendor
+      .removeRestaurant(rsnt)
+      .then(() => this.renderGrid(vendor))
+      .catch(alert)
   }
 
   renderGrid = (vendor) => {
@@ -104,8 +120,15 @@ class dashboard {
         (a, b) => new Date(b.date_added) - new Date(a.date_added)
       )
 
-      this.gridView.set(rsnts, () => this.renderGrid(vendor))
+      this.gridView.set(rsnts, (rsnt) => {
+        if (rsnt.items.length > 0) {
+          this.unfavoriteModal.set(rsnt)
+          this.unfavoriteModal.e.modal("open")
+        } else {
+          this.doUnfavorite(rsnt)
+        }
+      })
     })
   }
-
+  
 }

@@ -19,9 +19,6 @@ const formatTime = (date) => {
 
 class storeCard {
   constructor(rsnt, onUnfavorite) {
-    this.rsnt = rsnt
-    this.onUnfavorite = onUnfavorite
-
     this.e = $("<div/>", {
       class: "card hoverable",
       html: `
@@ -35,7 +32,7 @@ class storeCard {
       </div>
       <div class="card-content">
         <span class="card-title grey-text text-darken-4">
-          <strong>${rsnt.name}</strong>
+          <strong class="truncate">${rsnt.name}</strong>
           <span class="right valign-wrapper grey-text text-darken-2" style="font-size:15px">
               ${
                 rsnt.items.length
@@ -47,14 +44,7 @@ class storeCard {
     </div>`
     })
 
-    this.e
-      .find(".fav-btn")
-      .click(() =>
-        new Vendor(this.rsnt.vendor.name)
-          .removeRestaurant(this.rsnt)
-          .then(() => this.onUnfavorite(this.rsnt))
-          .catch(alert)
-      )
+    this.e.find(".fav-btn").click(() => onUnfavorite(rsnt))
   }
 
   get = () => this.e
