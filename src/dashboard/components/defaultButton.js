@@ -9,9 +9,7 @@ class defaultButton {
     isDefault ? this.setDefault(this.e) : this.setNotDefault(this.e)
   }
 
-  get() {
-    return this.e
-  }
+  get = () => this.e
 
   setDefault = () => {
     this.e
