@@ -1,37 +1,25 @@
-class Restaurant {
-  constructor(name, url, src, vendor) {
-    this.vendor = vendor
-    this.name = name
-    this.url = url
-    this.src = src
-  }
-
-  updateItem = (item_name, action) =>
-    this.vendor.defaultFetch().then((vendor) => {
-      const { rsnts } = vendor
-      const rsnt = rsnts[this.url]
-
-      if (rsnt === undefined)
-        return Promise.reject("Trying to access restaurant not added to vendor")
-
-      const { items } = rsnt
-      const isSaved = items.includes(item_name)
-
-      switch (action) {
-        case "add":
-          if (isSaved) return Promise.reject("This item is already saved")
-          items = items.push(item)
-          break
-        case "remove":
-          if (!isSaved) return Promise.reject("This item is already unsaved")
-          items = items.filter((name) => name !== item_name)
-          break
-        default:
+class Settings {
+  defaultFetch = () =>
+    new Promise((resolve) => {
+      const defaultObj = {
+        default_vendor: "doordash"
       }
-      rsnt.items = items
 
-      chrome.storage.sync.set({ [this.vendor.name]: { ...vendor, rsnts } })
+      chrome.storage.sync.get({ settings: defaultObj }, (res) =>
+        resolve(res.settings)
+      )
     })
+
+  update = (new_settings) =>
+    this.defaultFetch().then(
+      (settings) =>
+        new Promise((resolve) => {
+          chrome.storage.sync.set(
+            { settings: { ...settings, ...new_settings } },
+            (res) => resolve(res.settings)
+          )
+        })
+    )
 }
 
 class Vendor {
@@ -72,26 +60,36 @@ class Vendor {
     })
 }
 
-class Settings {
-  defaultFetch = () =>
-    new Promise((resolve) => {
-      const defaultObj = {
-        default_vendor: "doordash"
+class Restaurant {
+  constructor(v_name, url) {
+    this.vendor = v_name
+    this.url = url
+  }
+
+  updateItem = (item_name, action) =>
+    new Vendor(this.vendor).defaultFetch().then((vendor) => {
+      const { rsnts } = vendor
+      const rsnt = rsnts[this.url]
+
+      if (rsnt === undefined)
+        return Promise.reject("Trying to access restaurant not added to vendor")
+
+      const { items } = rsnt
+      const isSaved = items.includes(item_name)
+
+      switch (action) {
+        case "add":
+          if (isSaved) return Promise.reject("This item is already saved")
+          items = items.push(item)
+          break
+        case "remove":
+          if (!isSaved) return Promise.reject("This item is already unsaved")
+          items = items.filter((name) => name !== item_name)
+          break
+        default:
       }
+      rsnt.items = items
 
-      chrome.storage.sync.get({ settings: defaultObj }, (res) =>
-        resolve(res.settings)
-      )
+      chrome.storage.sync.set({ [this.vendor.name]: { ...vendor, rsnts } })
     })
-
-  update = (new_settings) =>
-    this.defaultFetch().then(
-      (settings) =>
-        new Promise((resolve) => {
-          chrome.storage.sync.set(
-            { settings: { ...settings, ...new_settings } },
-            (res) => resolve(res.settings)
-          )
-        })
-    )
 }
