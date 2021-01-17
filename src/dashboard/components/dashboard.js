@@ -2,28 +2,36 @@ class dashboard {
   vendors = {
     doordash: {
       title: "DoorDash",
-      color: "#ec4528"
+      color: "#EC4528"
     },
     ubereats: {
       title: "UberEats",
-      color: "#ec4528"
+      color: "#529F08"
     },
     grubhub: {
       title: "GrubHub",
-      color: "#ec4528"
+      color: "#F74A55"
     }
   }
 
+  vendorTitle = new vendorTitle()
+
+  doordashBtn = new vendorButton("doordash", "doordash-vendor-btn")
+
+  ubereatsBtn = new vendorButton("ubereats")
+
+  grubhubBtn = new vendorButton("grubhub")
+
+  defaultBtn = new defaultButton(false)
+
+  gridView = new gridView()
+
+  settings = new Settings()
+
   constructor() {
-    this.vendorTitle = new vendorTitle()
-
-    this.doordashBtn = new vendorButton("doordash", "doordash-vendor-btn")
-    this.ubereatsBtn = new vendorButton("ubereats")
-    this.grubhubBtn = new vendorButton("grubhub")
-
-    this.defaultBtn = new defaultButton(false)
-
-    this.gridView = new gridView()
+    for (const v_name1 of Object.keys(this.vendors)) {
+      this[`${v_name1}Btn`].e.click(() => this.setVendor(v_name1))
+    }
 
     const header = $("<div/>", {
       class: "row valign-wrapper",
@@ -55,7 +63,9 @@ class dashboard {
       style: "width: 95vw; margin: auto; margin-top: 15px"
     }).append([logo, header, divider, this.gridView.get()])
 
-    this.setVendor("doordash")
+    this.settings
+      .defaultFetch()
+      .then(({ default_vendor }) => this.setVendor(default_vendor))
 
     $("body").prepend(content)
   }
@@ -74,23 +84,28 @@ class dashboard {
       }
     }
 
-    this.fetchDefaultVendor().then((default_name) => {
+    this.settings.defaultFetch().then(({ default_vendor }) => {
       const { setDefault, setNotDefault } = this.defaultBtn
-      v_name == default_name ? setDefault() : setNotDefault()
+      v_name == default_vendor ? setDefault() : setNotDefault()
+
+      this.defaultBtn.e.off("click")
+      this.defaultBtn.e.click(() => {
+        this.settings.update({ default_vendor: v_name })
+        this.defaultBtn.setDefault()
+      })
     })
 
+    this.renderGrid(vendor)
+  }
+
+  renderGrid = (vendor) => {
     vendor.defaultFetch().then(({ rsnts }) => {
       rsnts = Object.values(rsnts).sort(
         (a, b) => new Date(b.date_added) - new Date(a.date_added)
       )
-      this.gridView.set(rsnts)
+
+      this.gridView.set(rsnts, () => this.renderGrid(vendor))
     })
   }
 
-  fetchDefaultVendor = () =>
-    new Promise((resolve) =>
-      chrome.storage.sync.get({ default_vendor: "doordash" }, (res) =>
-        resolve(res.default_vendor)
-      )
-    )
 }

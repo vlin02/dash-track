@@ -1,7 +1,7 @@
 class defaultButton {
   constructor(isDefault) {
     this.e = $("<a/>", {
-      class: "waves-effect",
+      class: "waves-effect hide-on-small-only",
       style: "border-radius: 5px; display: flex;",
       html: "DEFAULT"
     })

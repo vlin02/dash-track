@@ -22,7 +22,6 @@
 .selected-vendor-btn {
     pointer-events: none;
     cursor: default;
-    border: 1px solid #536dfe;
 }
 
 .unselected-vendor-btn > img {

@@ -17,7 +17,7 @@ class pageFavoriteButton {
       class: "fav-item btn-floating grey darken-3",
       html: `<i class="material-icons yellow-text darken-1">star</i>`,
       "data-position": "left",
-      "data-tooltip": "View favorited items"
+      "data-tooltip": "Under Development - coming soon!"
     })
 
     this.toolBar = $("<ul/>").append([

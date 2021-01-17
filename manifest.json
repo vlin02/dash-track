@@ -27,7 +27,7 @@
         "src/thirdParty/jquery-3.5.1.min.js",
         "src/thirdParty/materialize.min.js",
         "src/storageCursors.js",
-        "src/vendorScripts/components/PageFavoriteButton.js"
+        "src/vendorScripts/components/pageFavoriteButton.js"
       ]
     },
     {

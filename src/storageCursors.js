@@ -7,7 +7,7 @@ class Restaurant {
   }
 
   updateItem = (item_name, action) =>
-    this.vendor.defaultFecth().then((vendor) => {
+    this.vendor.defaultFetch().then((vendor) => {
       const { rsnts } = vendor
       const rsnt = rsnts[this.url]
 
@@ -45,6 +45,7 @@ class Vendor {
         name: this.name,
         rsnts: {}
       }
+
       chrome.storage.sync.get({ [this.name]: defaultObj }, (res) =>
         resolve(res[this.name])
       )
@@ -69,4 +70,28 @@ class Vendor {
       delete rsnts[rsnt.url]
       chrome.storage.sync.set({ [this.name]: { ...vendor, rsnts } })
     })
+}
+
+class Settings {
+  defaultFetch = () =>
+    new Promise((resolve) => {
+      const defaultObj = {
+        default_vendor: "doordash"
+      }
+
+      chrome.storage.sync.get({ settings: defaultObj }, (res) =>
+        resolve(res.settings)
+      )
+    })
+
+  update = (new_settings) =>
+    this.defaultFetch().then(
+      (settings) =>
+        new Promise((resolve) => {
+          chrome.storage.sync.set(
+            { settings: { ...settings, ...new_settings } },
+            (res) => resolve(res.settings)
+          )
+        })
+    )
 }
