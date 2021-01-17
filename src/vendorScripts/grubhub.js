@@ -8,11 +8,18 @@ new MutationObserver(() => {
   if (schema.length !== 0 && favWrapper.length == 0 && injectDiv.length) {
     const context = JSON.parse(schema.html())
 
-    if ($("title").text().match(/ | Order Online With Grubhub$/)) {
+    if (
+      $("title")
+        .text()
+        .match(/ | Order Online With Grubhub$/)
+    ) {
       injectDiv.append(
-        new pageFavoriteButton(
-          new Restaurant(context["name"],  context["@id"], context["image"], vendor)
-        ).buttonWrapper
+        new pageFavoriteButton({
+          name: context["name"],
+          url: context["@id"],
+          src: context["image"],
+          vendor: "grubhub"
+        }).buttonWrapper
       )
     }
   } else if (favWrapper.length > 1) {

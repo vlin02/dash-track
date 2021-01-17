@@ -13,7 +13,9 @@
     "persistent": false
   },
   "content_scripts": [
+    
     {
+      "run_at": "document_start",
       "matches": [
         "https://www.doordash.com/*",
         "https://www.ubereats.com/*",
@@ -35,6 +37,7 @@
       "js": ["src/vendorScripts/doordash.js"]
     },
     {
+      "run_at": "document_start",
       "matches": ["https://www.ubereats.com/*"],
       "js": ["src/vendorScripts/ubereats.js"]
     },

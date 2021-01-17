@@ -1,6 +1,7 @@
 class pageFavoriteButton {
   constructor(rsnt) {
     this.rsnt = rsnt
+    this.vendor = new Vendor(this.rsnt.vendor)
 
     this.buttonWrapper = $("<div/>", {
       class: "fixed-action-btn direction-top favorite-wrapper",
@@ -26,7 +27,7 @@ class pageFavoriteButton {
       })
     ])
 
-    this.rsnt.vendor.defaultFetch().then(({ rsnts }) => {
+    this.vendor.defaultFetch().then(({ rsnts }) => {
       this.buttonWrapper.append([this.favButton, this.toolBar])
 
       this.rsnt.url in rsnts ? this.setFavButton(true) : this.setNotFavButton()
@@ -42,7 +43,7 @@ class pageFavoriteButton {
 
     this.favButton.off("click")
     this.favButton.click(() => {
-      this.rsnt.vendor.removeRestaurant(this.rsnt).catch(alert)
+      this.vendor.removeRestaurant(this.rsnt).catch(alert)
       this.setNotFavButton()
     })
     
@@ -56,7 +57,7 @@ class pageFavoriteButton {
 
     this.favButton.off("click")
     this.favButton.click(() => {
-      this.rsnt.vendor.addRestaurant(this.rsnt).catch(alert)
+      this.vendor.addRestaurant(this.rsnt).catch(alert)
       this.setFavButton()
     })
     this.favButton.removeClass("fav-btn").addClass("not-fav-btn tooltipped")
