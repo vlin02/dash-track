@@ -1,95 +1,70 @@
-class Settings {
-  defaultFetch = () =>
-    new Promise((resolve) => {
-      const defaultObj = {
-        default_vendor: "doordash"
-      }
 
-      chrome.storage.sync.get({ settings: defaultObj }, (res) =>
-        resolve(res.settings)
-      )
-    })
-
-  update = (new_settings) =>
-    this.defaultFetch().then(
-      (settings) =>
-        new Promise((resolve) => {
-          chrome.storage.sync.set(
-            { settings: { ...settings, ...new_settings } },
-            (res) => resolve(res.settings)
-          )
-        })
-    )
-}
-
-class Vendor {
-  constructor(name) {
-    this.name = name
-  }
-
-  defaultFetch = () =>
-    new Promise((resolve) => {
-      const defaultObj = {
-        name: this.name,
-        rsnts: {}
-      }
-
-      chrome.storage.sync.get({ [this.name]: defaultObj }, (res) =>
-        resolve(res[this.name])
-      )
-    })
-
-  addRestaurant = (rsnt) =>
-    this.defaultFetch().then((vendor) => {
-      const { rsnts } = vendor
-      if (rsnt.url in rsnts)
-        return Promise.reject("This restaurant is already favorited")
-
-      rsnts[rsnt.url] = { ...rsnt, items: [], date_added: new Date().toJSON() }
-      chrome.storage.sync.set({ [this.name]: { ...vendor, rsnts } })
-    })
-
-  removeRestaurant = (rsnt) =>
-    this.defaultFetch().then((vendor) => {
-      const { rsnts } = vendor
-      if (!(rsnt.url in rsnts))
-        return Promise.reject("This restaurant is already unfavorited")
-
-      delete rsnts[rsnt.url]
-      chrome.storage.sync.set({ [this.name]: { ...vendor, rsnts } })
-    })
-}
+class Settings {}
 
 class Restaurant {
-  constructor(v_name, url) {
-    this.vendor = v_name
-    this.url = url
-  }
+    POST({ type, body }) {
+        switch (type) {
+            case "RESTAURANT":
+                return setRestaurant(body)
+            default:
+                throw "UNKNOWN_POST_TYPE"
+        }
+    }
+}
 
-  updateItem = (item_name, action) =>
-    new Vendor(this.vendor).defaultFetch().then((vendor) => {
-      const { rsnts } = vendor
-      const rsnt = rsnts[this.url]
+class Item {}
 
-      if (rsnt === undefined)
-        return Promise.reject("Trying to access restaurant not added to vendor")
+class dtAPI {
+    endpointsMapped = {
+        settings: new Settings(),
+        vendor: new Vendor(),
+        restaurant: new Restaurant(),
+        item: new Item()
+    }
 
-      const { items } = rsnt
-      const isSaved = items.includes(item_name)
+    prepareStorage() {
+        const vendors = new Vendor().default_vendors
+        const defaults = {
+            settings: {
+                default_vendor: Object.keys(vendors)[0]
+            },
+            vendors,
+            restaurants: [],
+            items: []
+        }
 
-      switch (action) {
-        case "add":
-          if (isSaved) return Promise.reject("This item is already saved")
-          items = items.push(item)
-          break
-        case "remove":
-          if (!isSaved) return Promise.reject("This item is already unsaved")
-          items = items.filter((name) => name !== item_name)
-          break
-        default:
-      }
-      rsnt.items = items
+        console.log(defaults)
 
-      chrome.storage.sync.set({ [this.vendor.name]: { ...vendor, rsnts } })
-    })
+        return new Promise((resolve) =>
+            chrome.storage.sync.get(defaults, resolve)
+        )
+    }
+
+    async get(endpoint, data) {
+        await this.prepareStorage()
+        const endpointClass = this.endpointsMapped[endpoint]
+
+        return endpointClass.GET(data)
+    }
+
+    async post(endpoint, data) {
+        await this.prepareStorage()
+        const endpointClass = this.endpointsMapped[endpoint]
+
+        return endpointClass.POST(data)
+    }
+
+    async delete(endpoint, data) {
+        await this.prepareStorage()
+        const endpointClass = this.endpointsMapped[endpoint]
+
+        return endpointClass.DELETE(data)
+    }
+
+    async patch(endpoint, data) {
+        await this.prepareStorage()
+        const endpointClass = this.endpointsMapped[endpoint]
+
+        return endpointClass.PATCH(data)
+    }
 }

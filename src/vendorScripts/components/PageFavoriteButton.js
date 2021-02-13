@@ -11,6 +11,7 @@ class pageFavoriteButton {
 
     this.favButton = $("<a/>", {
       class: "btn-floating btn-large",
+      style: "background-color: #424242",
       html: '<i class="material-icons">favorite</i>'
     })
 

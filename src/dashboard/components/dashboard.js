@@ -16,6 +16,7 @@ class dashboard {
       link: "https://grubhub.com/"
     }
   }
+  
   settings = new Settings()
 
   vendorTitle = new vendorTitle()
