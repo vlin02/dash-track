@@ -1,8 +1,8 @@
 class vendorAPI {
     storage = new storageAPI()
 
-    static checkSupported(id) {
-        if (!(id && id in storageAPI.default_vendors))
+    static checkSupported(v_id) {
+        if (!(v_id && v_id in storageAPI.default_vendors))
             throw "UNSUPPORTED_VENDOR"
     }
 
@@ -15,9 +15,9 @@ class vendorAPI {
         }
     }
 
-    async getVendor({ id }) {
-        vendorAPI.checkSupported(id)
+    async getVendor({ v_id }) {
+        vendorAPI.checkSupported(v_id)
 
-        return (await this.storage.get("vendors")).vendors[id]
+        return (await this.storage.get("vendors")).vendors[v_id]
     }
 }

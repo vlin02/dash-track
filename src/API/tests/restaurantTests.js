@@ -17,7 +17,7 @@ async function restaurantTests() {
                 await r_API.POST({
                     type: "RESTAURANT",
                     body: {
-                        id: "doordash",
+                        v_id: "doordash",
                         restaurant: {
                             name: "bob's burgers"
                         }
@@ -31,7 +31,7 @@ async function restaurantTests() {
             await r_API.POST({
                 type: "RESTAURANT",
                 body: {
-                    id: "doordash",
+                    v_id: "doordash",
                     restaurant: new_restaurant
                 }
             })
@@ -39,7 +39,7 @@ async function restaurantTests() {
             let rsnts = await r_API.GET({
                 type: "BY_VENDOR",
                 body: {
-                    id: "doordash"
+                    v_id: "doordash"
                 }
             })
 
@@ -58,7 +58,7 @@ async function restaurantTests() {
                     await r_API.POST({
                         type: "RESTAURANT",
                         body: {
-                            id: "doordash",
+                            v_id: "doordash",
                             restaurant: new_restaurant
                         }
                     }),
@@ -71,7 +71,7 @@ async function restaurantTests() {
             const rsnt = await r_API.GET({
                 type: "RESTAURANT",
                 body: {
-                    id: "doordash/bobs-burgers.com"
+                    r_id: "doordash/bobs-burgers.com"
                 }
             })
 
@@ -86,7 +86,7 @@ async function restaurantTests() {
                     await r_API.GET({
                         type: "RESTAURANT",
                         body: {
-                            id: "fake restaurant"
+                            r_id: "fake restaurant"
                         }
                     }),
                 "RESTAURANT_NOT_FOUND"

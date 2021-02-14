@@ -22,24 +22,24 @@ class restaurantAPI {
         }
     }
 
-    async getRestaurant({ id }) {
+    async getRestaurant({ r_id }) {
         const {restaurants} = await this.storage.get("restaurants")
-        if (!(id in restaurants)) throw "RESTAURANT_NOT_FOUND"
+        if (!(r_id in restaurants)) throw "RESTAURANT_NOT_FOUND"
 
-        return restaurants[id]
+        return restaurants[r_id]
     }
 
-    async getByVendor({ id }) {
+    async getByVendor({ v_id }) {
         const [vendor, {restaurants}] = await Promise.all([
-            this.vendor.getVendor({id}),
+            this.vendor.getVendor({v_id}),
             this.storage.get("restaurants")
         ])
 
-        return vendor.restaurants.map(id => restaurants[id])
+        return vendor.restaurants.map(r_id => restaurants[r_id])
     }
 
-    async addRestaurant({ id, restaurant }) {
-        vendorAPI.checkSupported(id)
+    async addRestaurant({ v_id, restaurant }) {
+        vendorAPI.checkSupported(v_id)
 
         const requiredFields = ["name", "url", "src"]
         if (!restaurant || !errUtils.keysExist(restaurant, requiredFields))
@@ -54,8 +54,8 @@ class restaurantAPI {
 
         const updated_vendors = {
             ...vendors,
-            [id]: {
-                ...vendors[id],
+            [v_id]: {
+                ...vendors[v_id],
                 restaurants: _.concat(restaurants, restaurant.url)
             }
         }
@@ -65,7 +65,6 @@ class restaurantAPI {
             [restaurant.url]: {
                 ...restaurant,
                 items: [],
-                vendor: id,
                 date_added: new Date().toJSON()
             }
         }
@@ -75,4 +74,6 @@ class restaurantAPI {
             restaurants: updated_restaurants
         })
     }
+
+    // async deleteRestaurant({ id, })
 }

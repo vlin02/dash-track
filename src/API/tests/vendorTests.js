@@ -26,7 +26,7 @@ async function vendorTests() {
             let req = {
                 type: "VENDOR",
                 body: {
-                    id: "doordash"
+                    v_id: "doordash"
                 }
             }
 
@@ -42,7 +42,7 @@ async function vendorTests() {
                 let req = {
                     type: "VENDOR",
                     body: {
-                        id: "randomvendor"
+                        v_id: "randomvendor"
                     }
                 }
 
@@ -56,7 +56,7 @@ async function vendorTests() {
                 let req = {
                     type: "???",
                     body: {
-                        id: "doordash"
+                        v_id: "doordash"
                     }
                 }
 

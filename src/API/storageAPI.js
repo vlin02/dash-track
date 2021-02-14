@@ -45,31 +45,25 @@ class storageAPI {
         return new Promise((resolve) => chrome.storage.sync.set(obj, resolve))
     }
 
+    async checkFirstAccess() {
+        const { version } = await this.#get("version")
+        if (version !== "1.0") await this.#set(storageAPI.defaults)
+    }
+
     async get(keys) {
         if (!Array.isArray(keys)) keys = [keys]
 
         for (const key of keys) storageAPI.checkSupported(key)
-
-        const { version } = await this.#get("version")
-        if (version !== "1.0") await this.#set(storageAPI.defaults)
-
-        // const defaulted = _.pick(
-        //     storageAPI.defaults,
-        //     keys.filter((key) => !(key in res))
-        // )
-
-        // if (defaulted.length)
-        //     await this.set(defaulted)
+        await this.checkFirstAccess()
 
         return this.#get(keys)
     }
 
     async set(obj) {
         const keys = _.keys(obj)
-        for (const key of keys) storageAPI.checkSupported(key)
 
-        const { version } = await this.#get("version")
-        if (version !== "1.0") await this.#set(storageAPI.defaults)
+        for (const key of keys) storageAPI.checkSupported(key)
+        await this.checkFirstAccess()
 
         return this.#set(obj)
     }
