@@ -6,6 +6,6 @@ chrome.browserAction.onClicked.addListener(function (tab) {
       } 
     }
 
-    chrome.tabs.create({ url: chrome.extension.getURL("src/API/tests/tests.html")})
+    chrome.tabs.create({ url: chrome.extension.getURL("src/dashboard/index.html")})
   })
 })

@@ -1,79 +1,67 @@
-class restaurantAPI {
-    storage = new storageAPI()
-    vendor = new vendorAPI()
-
-    GET({ type, body }) {
-        switch (type) {
-            case "RESTAURANT":
-                return this.getRestaurant(body)
-            case "BY_VENDOR":
-                return this.getByVendor(body)
-            default:
-                throw "UNKNOWN_RESTAURANT_GET_TYPE"
-        }
+define(["lodash", "./vendorAPI", "APIerrors"], (
+    _,
+    vendorAPI,
+    {
+        RequiredFieldError,
+        RestaurantNotFoundError,
+        RestaurantAlreadyExistsError
     }
+) => {
+    class restaurantAPI {
+        vendor = new vendorAPI()
 
-    POST({ type, body }) {
-        switch (type) {
-            case "RESTAURANT":
-                return this.addRestaurant(body)
-            default:
-                throw "UNKNOWN_RESTAURANT_POST_TYPE"
-        }
-    }
+        async GET({ v_id, r_id }) {
+            if (!v_id) throw new RequiredFieldError("v_id")
 
-    async getRestaurant({ r_id }) {
-        const {restaurants} = await this.storage.get("restaurants")
-        if (!(r_id in restaurants)) throw "RESTAURANT_NOT_FOUND"
+            const { restaurants } = await this.vendor.GET({ v_id })
 
-        return restaurants[r_id]
-    }
+            if (r_id) {
+                if (!(r_id in restaurants))
+                    throw new RestaurantNotFoundError(v_id, r_id)
 
-    async getByVendor({ v_id }) {
-        const [vendor, {restaurants}] = await Promise.all([
-            this.vendor.getVendor({v_id}),
-            this.storage.get("restaurants")
-        ])
-
-        return vendor.restaurants.map(r_id => restaurants[r_id])
-    }
-
-    async addRestaurant({ v_id, restaurant }) {
-        vendorAPI.checkSupported(v_id)
-
-        const requiredFields = ["name", "url", "src"]
-        if (!restaurant || !errUtils.keysExist(restaurant, requiredFields))
-            throw "RESTAURANT_MISSING_FIELDS"
-
-        const { vendors, restaurants } = await this.storage.get([
-            "vendors",
-            "restaurants"
-        ])
-
-        if (restaurant.url in restaurants) throw "RESTAURANT_ALREADY_EXISTS"
-
-        const updated_vendors = {
-            ...vendors,
-            [v_id]: {
-                ...vendors[v_id],
-                restaurants: _.concat(restaurants, restaurant.url)
+                return restaurants[r_id]
             }
+
+            return restaurants
         }
 
-        const updated_restaurants = {
-            ...restaurants,
-            [restaurant.url]: {
-                ...restaurant,
-                items: [],
-                date_added: new Date().toJSON()
-            }
+        async POST({ v_id, restaurant }) {
+            const requiredFields = ["name", "url", "src"]
+            if (!restaurant) throw new RequiredFieldError("restaurant")
+
+            for (const field of requiredFields)
+                if (!(field in restaurant)) throw new RequiredFieldError(field)
+
+            const { restaurants } = await this.vendor.GET({ v_id })
+
+            if (restaurant.url in restaurants)
+                throw new RestaurantAlreadyExistsError(restaurant.url)
+
+            await this.vendor.PATCH({
+                v_id: v_id,
+                restaurants: {
+                    ...restaurants,
+                    [restaurant.url]: {
+                        ...restaurant,
+                        items: [],
+                        date_added: new Date().toJSON()
+                    }
+                }
+            })
         }
 
-        this.storage.set({
-            vendors: updated_vendors,
-            restaurants: updated_restaurants
-        })
+        async DELETE({ v_id, r_id }) {
+            const { restaurants } = await this.vendor.GET({ v_id })
+
+            if (!(r_id in restaurants))
+                throw new RestaurantNotFoundError(v_id, r_id)
+
+            await this.vendor.PATCH({
+                v_id: v_id,
+                restaurants: _.omit(restaurants, r_id)
+            })
+        }
     }
 
-    // async deleteRestaurant({ id, })
-}
+    return restaurantAPI
+})

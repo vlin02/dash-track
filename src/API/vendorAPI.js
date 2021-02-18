@@ -1,23 +1,44 @@
-class vendorAPI {
-    storage = new storageAPI()
+define(["lodash", "./storageAPI", "APIerrors"], (
+    _,
+    storageAPI,
+    { IllegalFieldError, UnsupportedVendorError }
+) => {
+    class vendorAPI {
+        storage = new storageAPI()
 
-    static checkSupported(v_id) {
-        if (!(v_id && v_id in storageAPI.default_vendors))
-            throw "UNSUPPORTED_VENDOR"
-    }
+        checkSupported(v_id) {
+            if (!(v_id && v_id in this.storage.default_vendors))
+                throw new UnsupportedVendorError(v_id)
+        }
 
-    GET({ type, body }) {
-        switch (type) {
-            case "VENDOR":
-                return this.getVendor(body)
-            default:
-                throw "UNKNOWN_VENDOR_GET_TYPE"
+        async GET({ v_id }) {
+            if (v_id) this.checkSupported(v_id)
+
+            const vendors = await this.storage.get("vendors")
+
+            return v_id ? vendors[v_id] : vendors
+        }
+
+        async PATCH({ v_id, ...patch }) {
+            this.checkSupported(v_id)
+
+            const allowedFields = ["restaurants"]
+
+            for (const field in patch)
+                if (!_.includes(allowedFields, field))
+                    throw new IllegalFieldError(field)
+
+            const vendors = await this.storage.get("vendors")
+
+            await this.storage.set("vendors", {
+                ...vendors,
+                [v_id]: {
+                    ...vendors[v_id],
+                    ...patch
+                }
+            })
         }
     }
 
-    async getVendor({ v_id }) {
-        vendorAPI.checkSupported(v_id)
-
-        return (await this.storage.get("vendors")).vendors[v_id]
-    }
-}
+    return vendorAPI
+})

@@ -1,69 +1,82 @@
 // Test Vendor class
 
-async function vendorTests() {
-    let TEST
-    const v_API = new vendorAPI()
+define(["jquery", "API/vendorAPI", "APIerrors"], (
+    $,
+    vendorAPI,
+    { TestError, errUtils, UnsupportedVendorError, IllegalFieldError }
+) => {
+    async function vendorTests() {
+        let TEST
+        const v_API = new vendorAPI()
 
-    try {
-        $("#test-log").append("<li>Running Vendor tests</li>")
+        try {
+            $("#test-log").append("<li>Running Vendor tests</li>")
 
-        TEST = "SUPPORTED_VENDOR_CHECK"
-        {
-            vendorAPI.checkSupported("doordash")
-            vendorAPI.checkSupported("ubereats")
-        }
-        
-        TEST = "UNSUPPORTED_VENDOR_CHECK"
-        {
-            await errUtils.assertErrorThrown(
-                () => vendorAPI.checkSupported("randomvendor"),
-                "UNSUPPORTED_VENDOR"
-            )
-        }
-
-        TEST = "FETCH_SUPPORTED_VENDOR"
-        {
-            let req = {
-                type: "VENDOR",
-                body: {
-                    v_id: "doordash"
-                }
+            TEST = "SUPPORTED_VENDOR_CHECK"
+            {
+                v_API.checkSupported("doordash")
+                v_API.checkSupported("ubereats")
             }
 
-            let res = await v_API.GET(req)
+            TEST = "UNSUPPORTED_VENDOR_CHECK"
+            {
+                await errUtils.assertErrorThrown(
+                    () => v_API.checkSupported("randomvendor"),
+                    UnsupportedVendorError
+                )
+            }
 
-            if (!(res && res.title === "DoorDash"))
-                throw "incorrect vendor details"
+            TEST = "FETCH_SUPPORTED_VENDOR"
+            {
+                const res = await v_API.GET({
+                    v_id: "doordash"
+                })
+
+                if (!(res && res.title === "DoorDash"))
+                    throw new TestError("incorrect vendor details")
+            }
+
+            TEST = "FETCH_UNSUPPORTED_VENDOR"
+            {
+                await errUtils.assertErrorThrown(
+                    () =>
+                        v_API.GET({
+                            v_id: "randomvendor"
+                        }),
+                    UnsupportedVendorError
+                )
+            }
+
+            TEST = "PATCH_VENDOR_INVALID_FIELD"
+            {
+                await errUtils.assertErrorThrown(
+                    () =>
+                        v_API.PATCH({
+                            v_id: "doordash",
+                            title: "not DoorDash"
+                        }),
+                    IllegalFieldError
+                )
+            }
+
+            TEST = "PATCH_VENDOR_RESTAURANTS_FIELD"
+            {
+                await v_API.PATCH({
+                    v_id: "doordash",
+                    restaurants: "should be an object"
+                })
+
+                const { restaurants } = await v_API.GET({
+                    v_id: "doordash"
+                })
+
+                if (!(restaurants === "should be an object"))
+                    throw new TestError("vendor patch incorrectly set field")
+            }
+        } catch (e) {
+            throw { error: e, test: TEST }
         }
-
-        TEST = "FETCH_UNSUPPORTED_VENDOR"
-        {
-            await errUtils.assertErrorThrown(async () => {
-                let req = {
-                    type: "VENDOR",
-                    body: {
-                        v_id: "randomvendor"
-                    }
-                }
-
-                await v_API.GET(req)
-            }, "UNSUPPORTED_VENDOR")
-        }
-
-        TEST = "UNKNOWN_GET_TYPE"
-        {
-            await errUtils.assertErrorThrown(async () => {
-                let req = {
-                    type: "???",
-                    body: {
-                        v_id: "doordash"
-                    }
-                }
-
-                await v_API.GET(req)
-            }, "UNKNOWN_VENDOR_GET_TYPE")
-        }
-    } catch (e) {
-        throw `${TEST}: ${e}`
     }
-}
+
+    return vendorTests
+})

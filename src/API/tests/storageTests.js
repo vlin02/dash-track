@@ -1,70 +1,62 @@
-// Test Storage class
+define(["API/storageAPI", "APIerrors"], (
+    storageAPI,
+    { TestError, errUtils, StorageAccessError }
+) => {
+    async function storageTests() {
+        let TEST
+        const s_API = new storageAPI()
 
-async function storageTests() {
-    let TEST, res, assert
-    const s_API = new storageAPI()
+        try {
+            $("#test-log").append("<li>Running Storage tests</li>")
 
-    try {
-        $("#test-log").append("<li>Running Storage tests</li>")
+            TEST = "GET_SINGLE_DEFAULT_KEY"
+            {
+                const res = await s_API.get("vendors")
 
-        TEST = "GET_SINGLE_DEFAULT_KEY"
-        {
-            res = await s_API.get("vendors")
+                assert =
+                    _.keys(res).length === 3 &&
+                    res.doordash.title === "DoorDash"
 
-            assert =
-                Object.keys(res).length === 1 &&
-                res.vendors.doordash.title === "DoorDash"
+                if (!assert) throw new TestError("incorrect response")
+            }
 
-            if (!assert) throw "incorrect response"
+            TEST = "GET_INVALID_KEY"
+            {
+                await errUtils.assertErrorThrown(
+                    () => s_API.get("invalid key"),
+                    StorageAccessError
+                )
+            }
+
+            TEST = "SET_INVALID_KEY"
+            {
+                await errUtils.assertErrorThrown(
+                    () => s_API.set("invalid_key", 123),
+                    StorageAccessError
+                )
+            }
+
+            TEST = "SETTINGS_SET_BEFORE_GET"
+            {
+                await s_API.set("settings", { default_vendor: "ubereats" })
+                const settings = await s_API.get("settings")
+
+                if (settings.default_vendor !== "ubereats")
+                    throw new TestError("settings was not set")
+            }
+
+            TEST = "SETTINGS_SET_AGAIN"
+            {
+                await s_API.set("settings", { default_vendor: "grubhub" })
+                const settings = await s_API.get("settings")
+
+                if (settings.default_vendor !== "grubhub")
+                    throw new TestError("settings not changed")
+            }
+        } catch (e) {
+            throw { error: e, test: TEST }
         }
-
-        TEST = "GET_MULTI_DEFAULT_KEYS"
-        {
-            res = await s_API.get(["items", "restaurants"])
-
-            assert =
-                Object.keys(res).length === 2 &&
-                Array.isArray(res.items) &&
-                Array.isArray(res.restaurants)
-
-            if (!assert) throw "incorrect response"
-        }
-
-        TEST = "GET_INVALID_KEY"
-        {
-            await errUtils.assertErrorThrown(
-                async () => await s_API.get(["vendors", "invalid key"]),
-                "UNKNOWN_STORAGE_KEY"
-            )
-        }
-
-        TEST = "SET_INVALID_KEY"
-        {
-            await errUtils.assertErrorThrown(
-                async () => await s_API.set({ invalid_key: 123 }),
-                "UNKNOWN_STORAGE_KEY"
-            )
-        }
-
-        TEST = "SETTINGS_SET_BEFORE_GET"
-        {
-            await s_API.set({ settings: { default_vendor: "ubereats" } })
-            let { settings } = await s_API.get("settings")
-
-            if (settings.default_vendor !== "ubereats")
-                throw "settings was not set"
-        }
-
-        TEST = "SETTINGS_SET_AGAIN"
-        {
-            await s_API.set({ settings: { default_vendor: "grubhub" } })
-            const {settings} = (await s_API.get("settings"))
-
-            if (settings.default_vendor !== "grubhub")
-                throw "settings not changed"
-        }
-    } catch (e) {
-        console.log(e)
-        throw `${TEST}: ${e}`
     }
-}
+
+    return storageTests
+})

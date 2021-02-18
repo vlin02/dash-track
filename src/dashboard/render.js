@@ -1,1 +1,0 @@
-$('body').prepend(new dashboard())

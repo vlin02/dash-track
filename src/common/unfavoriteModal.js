@@ -1,45 +1,54 @@
-class unfavoriteModal {
-  constructor(onConfirm) {
-    this.onConfirm = onConfirm
+define(["materialize", "jquery"], (_, $) => {
+    class UnfavoriteModal {
 
-    this.e = $("<div/>", {
-      class: "modal",
-      style: "width: 400px !important;",
-      html: `
-        <div class="modal-content">
-            <h4 class="red-text text-accent-2">Confirm Unfavorite</h4>
-           
-        </div>
-        <div class="modal-footer">
-        </div>
-        `
-    })
+        constructor(onConfirm) {
+            this.onConfirm = onConfirm
 
-    this.modalDetails = $("<h6/>", { style: "line-height: 1.5;" })
+            this.e = $("<div/>", {
+                class: "modal",
+                style: "width: 400px !important;",
+                html: `
+                    <div class="modal-content" style="padding-bottom: 0px">
+                    </div>
+                    <div class="modal-footer" style="padding: 0px">
+                    </div>
+                `
+            })
 
-    this.confirmBtn = $("<button/>", {
-      class: "waves-effect waves-red waves-accent-3 btn-flat",
-      html: "Unfavorite"
-    })
+            this.modalDetails = $("<h6/>", { style: "line-height: 1.5;" })
 
-    this.e.find(".modal-content").append(this.modalDetails)
-    this.e.find(".modal-footer").append(this.confirmBtn)
-    this.e.modal()
-  }
+            this.confirmBtn = $("<button/>", {
+                class: "waves-effect waves-red waves-accent-3 btn-flat",
+                style: "margin-right: 20px",
+                html: "Unfavorite"
+            })
 
-  set = (rsnt) => {
-    const { name, items } = rsnt
+            this.e.find(".modal-content").append(this.modalDetails)
+            this.e.find(".modal-footer").append(this.confirmBtn)
+            this.e.modal()
+        }
 
-    this.modalDetails.html(
-      `Unfavoriting <strong>${name}</strong> will also remove the <strong>${items.length}</strong> items saved`
-    )
+        get = () => this.e
 
-    this.confirmBtn.off("click")
-    this.confirmBtn.click(() => {
-      this.onConfirm(rsnt)
-      this.e.modal("close")
-    })
-  }
+        show = () => this.e.modal("open")
 
-  get = () => this.e
-}
+        set = (vendor, rsnt) => {
+            const { name } = rsnt
+
+            this.modalDetails.html(
+                `
+                <h4 class="red-text text-accent-2">Confirm Unfavorite</h4>
+                <p>Unfavoriting <strong>${name}</strong> will also delete all associated restaurant info</p>
+                `
+            )
+
+            this.confirmBtn.off("click")
+            this.confirmBtn.click(() => {
+                this.onConfirm(vendor, rsnt)
+                this.e.modal("close")
+            })
+        }
+    }
+
+    return UnfavoriteModal
+})

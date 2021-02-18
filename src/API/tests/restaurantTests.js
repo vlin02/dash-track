@@ -1,99 +1,131 @@
-async function restaurantTests() {
-    let TEST
-    const r_API = new restaurantAPI()
-
-    const new_restaurant = {
-        name: "bob's burgers",
-        url: "doordash/bobs-burgers.com",
-        src: "some-url.png"
+define(["jquery", "API/restaurantAPI", "APIerrors"], (
+    $,
+    restaurantAPI,
+    {
+        TestError,
+        errUtils,
+        RequiredFieldError,
+        RestaurantAlreadyExistsError,
+        RestaurantNotFoundError
     }
+) => {
+    async function restaurantTests() {
+        let TEST
+        const r_API = new restaurantAPI()
 
-    try {
-        $("#test-log").append("<li>Running Restaurant tests</li>")
-
-        TEST = "ADD_RESTAURANT_MISSING_FIELDS"
-        {
-            await errUtils.assertErrorThrown(async () => {
-                await r_API.POST({
-                    type: "RESTAURANT",
-                    body: {
-                        v_id: "doordash",
-                        restaurant: {
-                            name: "bob's burgers"
-                        }
-                    }
-                })
-            }, "RESTAURANT_MISSING_FIELDS")
+        const new_restaurant = {
+            name: "bob's burgers",
+            url: "doordash/bobs-burgers.com",
+            src: "some-url.png"
         }
-        
-        TEST = "ADD_VALID_RESTAURANT"
-        {
-            await r_API.POST({
-                type: "RESTAURANT",
-                body: {
+
+        try {
+            $("#test-log").append("<li>Running Restaurant tests</li>")
+
+            TEST = "ADD_RESTAURANT_MISSING_FIELDS"
+            {
+                await errUtils.assertErrorThrown(
+                    () =>
+                        r_API.POST({
+                            v_id: "doordash",
+                            restaurant: {
+                                name: "bob's burgers"
+                            }
+                        }),
+                    RequiredFieldError
+                )
+            }
+
+            TEST = "ADD_VALID_RESTAURANT"
+            {
+                await r_API.POST({
                     v_id: "doordash",
                     restaurant: new_restaurant
-                }
-            })
+                })
 
-            let rsnts = await r_API.GET({
-                type: "BY_VENDOR",
-                body: {
+                const rsnts = await r_API.GET({
                     v_id: "doordash"
-                }
-            })
+                })
 
-            assert =
-                rsnts.length === 1 &&
-                rsnts[0].name === new_restaurant.name &&
-                rsnts[0].date_added
+                const rsnt = rsnts[new_restaurant.url]
 
-            if (!assert) throw "restaurant not stored or stored incorrectly"
-        }
+                assert =
+                    rsnt && rsnt.name === new_restaurant.name && rsnt.date_added
 
-        TEST = "ADD_REPEAT_RESTAURANT"
-        {
-            await errUtils.assertErrorThrown(
-                async () =>
-                    await r_API.POST({
-                        type: "RESTAURANT",
-                        body: {
+                if (!assert)
+                    throw new TestError(
+                        `Incorrect restaurant response ${JSON.stringify(rsnt)}`
+                    )
+            }
+
+            TEST = "ADD_REPEAT_RESTAURANT"
+            {
+                await errUtils.assertErrorThrown(
+                    () =>
+                        r_API.POST({
                             v_id: "doordash",
                             restaurant: new_restaurant
-                        }
-                    }),
-                "RESTAURANT_ALREADY_EXISTS"
-            )
-        }
+                        }),
+                    RestaurantAlreadyExistsError
+                )
+            }
 
-        TEST = "FETCH_RESTAURANT_EXISTS"
-        {
-            const rsnt = await r_API.GET({
-                type: "RESTAURANT",
-                body: {
+            TEST = "FETCH_RESTAURANT_EXISTS"
+            {
+                const rsnt = await r_API.GET({
+                    v_id: "doordash",
                     r_id: "doordash/bobs-burgers.com"
-                }
-            })
+                })
 
-            assert = rsnt && rsnt.name === "bob's burgers"
-            if (!assert) throw "improper fetch response"
-        }
+                assert = rsnt && rsnt.name === "bob's burgers"
+                if (!assert)
+                    throw new TestError(
+                        `Incorrect restaurant response ${JSON.stringify(rsnt)}`
+                    )
+            }
 
-        TEST = "FETCH_RESTAURANT_NOT_FOUND"
-        {
-            await errUtils.assertErrorThrown(
-                async () =>
-                    await r_API.GET({
-                        type: "RESTAURANT",
-                        body: {
+            TEST = "FETCH_UNKNOWN_RESTAURANT"
+            {
+                await errUtils.assertErrorThrown(
+                    () =>
+                        r_API.GET({
+                            v_id: "doordash",
                             r_id: "fake restaurant"
-                        }
-                    }),
-                "RESTAURANT_NOT_FOUND"
-            )
+                        }),
+                    RestaurantNotFoundError
+                )
+            }
+
+            TEST = "DELETE_UNKNOWN_RESTAURANT"
+            {
+                await errUtils.assertErrorThrown(
+                    () =>
+                        r_API.DELETE({
+                            v_id: "doordash",
+                            r_id: "fake restaurant"
+                        }),
+                    RestaurantNotFoundError
+                )
+            }
+
+            TEST = "DELETE_RESTAURANT_EXISTS"
+            {
+                await r_API.DELETE({
+                    v_id: "doordash",
+                    r_id: "doordash/bobs-burgers.com"
+                })
+
+                const rsnts = await r_API.GET({
+                    v_id: "doordash"
+                })
+
+                if (_.keys(rsnts).length > 0)
+                    throw new TestError("Known restaurant was not deleted")
+            }
+        } catch (e) {
+            throw { error: e, test: TEST }
         }
-    } catch (e) {
-        console.log(e)
-        throw `${TEST}: ${e}`
     }
-}
+
+    return restaurantTests
+})
