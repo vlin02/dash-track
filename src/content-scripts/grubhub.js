@@ -2,13 +2,6 @@ define(["jquery", "./components/pageFavoriteButton"], (
     $,
     pageFavoriteButton
 ) => {
-    $("body").append(
-        $("<script/>", {
-            id: "jq",
-            src: "https://code.jquery.com/jquery-3.3.1.min.js"
-        })
-    )
-
     const mainObs = new MutationObserver(() => {
         const schema = $(
             'script[type="application/ld+json"]:contains(@context)'
