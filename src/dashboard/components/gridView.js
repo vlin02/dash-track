@@ -13,8 +13,8 @@ define([
         }
 
         onUnfavorite(rsnt) {
-            this.unfavoriteModal.show()
             this.unfavoriteModal.set(this.state.selected_vendor, rsnt)
+            this.unfavoriteModal.show()
         }
 
         async onConfirm(vendor, rsnt) {
