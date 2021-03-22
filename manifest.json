@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "DashTrack - Doordash Favorites & More",
   "description": "Track your favorite restaurants & dishes on DoorDash, UberEats, & Grubhub!",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "icons": { "128": "images/dash-track-icon.png" },
   "web_accessible_resources": ["images/*", "src/*"],
   "browser_action": {
@@ -13,7 +13,6 @@
     "persistent": false
   },
   "content_scripts": [
-    
     {
       "matches": [
         "https://www.doordash.com/*",
