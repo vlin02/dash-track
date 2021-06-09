@@ -19,7 +19,7 @@ define(["jquery", "./components/pageFavoriteButton"], (
 
             if (
                 new RegExp(
-                    /^https:\/\/www.ubereats.com\/.*\/food-delivery\/.*$/
+                    /^https:\/\/www.ubereats.com\/store\/.*$/
                 ).test(location.href)
             ) {
                 const img_src = context["image"][2].replace("\\u002F", "/")
