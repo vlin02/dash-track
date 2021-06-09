@@ -2,7 +2,7 @@ define(["jquery", "./components/pageFavoriteButton"], (
     $,
     pageFavoriteButton
 ) => {
-    const mainObs = new MutationObserver(() => {
+    const mainObs = () => {
         const schema = $(
             'script[type="application/ld+json"]:contains(@context)'
         )
@@ -44,7 +44,7 @@ define(["jquery", "./components/pageFavoriteButton"], (
         } else if (favWrapper.length > 1) {
             favWrapper.first().remove()
         }
-    })
+    }
 
     return [mainObs]
 })

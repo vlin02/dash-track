@@ -16,6 +16,12 @@ require([
         }
     })()
 
-    for (obs of vendor_obs)
-        obs.observe(document.body, { childList: true, subtree: true })
+    for (obs of vendor_obs) {
+        obs()
+        
+        new MutationObserver(obs).observe(document.body, {
+            childList: true,
+            subtree: true
+        })
+    }
 })
