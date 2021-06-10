@@ -23,8 +23,8 @@ define(["jquery", "./components/pageFavoriteButton"], (
         if (
             schema.length &&
             injectDiv.length &&
-            !favWrapper.length &&
             thumbnail_img &&
+            !favWrapper.length &&
             chrome.storage
         ) {
             const context = JSON.parse(JSON.parse(schema.html()))
