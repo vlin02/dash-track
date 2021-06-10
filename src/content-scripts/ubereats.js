@@ -3,6 +3,11 @@ define(["jquery", "./components/pageFavoriteButton"], (
     pageFavoriteButton
 ) => {
     const mainObs = () => {
+        const is_restaurant_page = new RegExp(
+            /^https:\/\/www.ubereats.com\/store\/.*$/
+        ).test(location.href)
+        if (!is_restaurant_page) return
+
         const schema = $(
             'script[type="application/ld+json"]:contains(@context)'
         )
@@ -16,23 +21,16 @@ define(["jquery", "./components/pageFavoriteButton"], (
             chrome.storage
         ) {
             const context = JSON.parse(schema.html())
+            const img_src = context["image"][2].replace("\\u002F", "/")
 
-            if (
-                new RegExp(
-                    /^https:\/\/www.ubereats.com\/store\/.*$/
-                ).test(location.href)
-            ) {
-                const img_src = context["image"][2].replace("\\u002F", "/")
-
-                injectDiv.append(
-                    new pageFavoriteButton({
-                        name: context["name"],
-                        url: context["@id"],
-                        src: img_src,
-                        vendor: "ubereats"
-                    }).buttonWrapper
-                )
-            }
+            injectDiv.append(
+                new pageFavoriteButton({
+                    name: context["name"],
+                    url: context["@id"],
+                    src: img_src,
+                    vendor: "ubereats"
+                }).buttonWrapper
+            )
         } else if (favWrapper.length > 1) {
             favWrapper.first().remove()
         }
