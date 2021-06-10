@@ -7,30 +7,27 @@ define(["jquery", "./components/pageFavoriteButton"], (
             'script[type="application/ld+json"]:contains(@context)'
         )
         const favWrapper = $(".favorite-wrapper")
-        const injectDiv = $("body > #root > div > div")
-        const first_item_img = $("picture > img")
+        const injectDiv = $("[style='z-index:1']")
+        const item_imgs = $("picture > img[src*='/media/photos/']")
 
         if (
             schema.length &&
             injectDiv.length &&
-            first_item_img.length &&
+            item_imgs.length &&
             !favWrapper.length &&
             chrome.storage
         ) {
-            const context = JSON.parse(schema.html())
+            const context = JSON.parse(JSON.parse(schema.html()))
 
             if (
                 new RegExp(/^https:\/\/www.doordash.com\/store\/.*$/).test(location.href)
             ) {
-                const banner = $("img[srcset*='/media/store']")
-                const item_imgs = first_item_img
-                    .attr("srcset")
-                    .split(/ \d+w,? ?/)
+                const banner = $("picture > img[src*='/media/store/header']")
 
                 const img_src =
                     banner.length !== 0
-                        ? banner[0].srcset.split(" ")[10]
-                        : item_imgs[4]
+                        ? banner[0].src
+                        : item_imgs[0].src
 
                 injectDiv.append(
                     new pageFavoriteButton({

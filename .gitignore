@@ -4,4 +4,4 @@ build/
 *.DS_store
 jsconfig.json
 .vscode/
-Archive*
+*.zip
