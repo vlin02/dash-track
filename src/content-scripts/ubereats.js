@@ -22,7 +22,8 @@ define(["jquery", "./components/pageFavoriteButton"], (
             chrome.storage
         ) {
             const context = JSON.parse(schema.html())
-            const img_src = context["image"][-1].replace("\\u002F", "/")
+            const thumbnail_imgs = context["image"]
+            const img_src = thumbnail_imgs[thumbnail_imgs.length - 1].replace("\\u002F", "/")
 
             injectDiv.append(
                 new pageFavoriteButton({
