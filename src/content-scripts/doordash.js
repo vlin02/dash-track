@@ -13,7 +13,7 @@ define(["jquery", "./components/pageFavoriteButton"], (
             'script[type="application/ld+json"]:contains(@context)'
         )
         const favWrapper = $(".favorite-wrapper")
-        const injectDiv = $("[style='z-index:1']")
+        const injectDiv = $("[style='z-index:1'], [style='z-index: 1;']")
 
         const banner = $("picture > img[src*='/media/store/header']")
         const item_imgs = $("picture > img[src*='/media/photos/']")
@@ -27,7 +27,8 @@ define(["jquery", "./components/pageFavoriteButton"], (
             !favWrapper.length &&
             chrome.storage
         ) {
-            const context = JSON.parse(JSON.parse(schema.html()))
+            let context = JSON.parse(schema.html())
+            context = typeof context === "string" ? JSON.parse(context) : context
 
             injectDiv.append(
                 new pageFavoriteButton({
