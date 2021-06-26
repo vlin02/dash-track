@@ -15,15 +15,15 @@ define(["jquery", "./components/pageFavoriteButton"], (
         const favWrapper = $(".favorite-wrapper")
         const injectDiv = $("[style='z-index:1'], [style='z-index: 1;']")
 
-        const banner = $("picture > img[src*='/media/store/header']")
-        const item_imgs = $("picture > img[src*='/media/photos/']")
+        const banner = $("img[src*='/media/store/header']")
+        const item_imgs = $("img[src*='/media/photos/']")
 
         const thumbnail_img = banner ?? item_imgs
 
         if (
             schema.length &&
             injectDiv.length &&
-            thumbnail_img &&
+            thumbnail_img.length &&
             !favWrapper.length &&
             chrome.storage
         ) {
