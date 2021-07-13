@@ -4,7 +4,7 @@ define(["jquery", "./components/pageFavoriteButton"], (
 ) => {
     const mainObs = () => {
         const is_restaurant_page = new RegExp(
-            /^https:\/\/www.ubereats.com\/store\/.*$/
+            /\/store\/.*$/
         ).test(location.href)
 
         if (!is_restaurant_page) return
