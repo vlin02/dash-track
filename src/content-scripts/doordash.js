@@ -32,7 +32,7 @@ define(["jquery", "./components/pageFavoriteButton"], (
             injectDiv.append(
                 new pageFavoriteButton({
                     name: name,
-                    url: canonical[0].href,
+                    url: canonical[0].href+'?utm_campaign=gpa', // legacy compatability
                     src: thumbnail_img[0].src,
                     vendor: "doordash"
                 }).buttonWrapper
