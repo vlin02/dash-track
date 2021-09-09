@@ -8,32 +8,31 @@ define(["jquery", "./components/pageFavoriteButton"], (
         ).test(location.href)
 
         if (!is_restaurant_page) return
+        
+        const title = $('title')
+        const canonical = $('[rel=canonical]')
 
-        const schema = $(
-            'script[type="application/ld+json"]:contains(@context)'
-        )
-        const favWrapper = $(".favorite-wrapper")
         const injectDiv = $("[style='z-index:1'], [style='z-index: 1;']")
+        const favWrapper = $(".favorite-wrapper")
 
         const banner = $("img[src*='/media/store/header']")
         const item_imgs = $("img[src*='/media/photos/']")
-
         const thumbnail_img = banner ?? item_imgs
 
         if (
-            schema.length &&
+            title.length && title[0].text &&
+            canonical.length &&
             injectDiv.length &&
             thumbnail_img.length &&
             !favWrapper.length &&
             chrome.storage
         ) {
-            let context = JSON.parse(schema.html())
-            context = typeof context === "string" ? JSON.parse(context) : context
+            const name = title[0].text.match(/(.*) Delivery & Takeout/)[1]
 
             injectDiv.append(
                 new pageFavoriteButton({
-                    name: context["name"],
-                    url: context["@id"],
+                    name: name,
+                    url: canonical[0].href,
                     src: thumbnail_img[0].src,
                     vendor: "doordash"
                 }).buttonWrapper
